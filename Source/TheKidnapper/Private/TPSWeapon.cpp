@@ -53,8 +53,11 @@ void ATPSWeapon::Fire()
 		FVector endLocation = startLocation + EyeRotation.Vector() * 10000;
 
 		FCollisionQueryParams QueryParams;
+
 		QueryParams.AddIgnoredActor(MyOwner);
+
 		QueryParams.AddIgnoredActor(this);
+
 		QueryParams.bTraceComplex = true;
 
 		FHitResult HitResult;
@@ -62,11 +65,9 @@ void ATPSWeapon::Fire()
 
 		if (bulletHitSomething)
 		{
-
 			AActor * HitActor = HitResult.GetActor();
 			
 			UGameplayStatics::ApplyPointDamage(HitActor, 20.0f, EyeRotation.Vector(), HitResult, MyOwner->GetInstigatorController(), this, damageType);
-
 		}
 
 		if (DebugWeaponDrawing > 0)
@@ -105,15 +106,15 @@ void ATPSWeapon::PlayFireEffects(FVector traceEnd)
 
 		if (PC)
 		{
+
 			UE_LOG(LogTemp, Warning, TEXT("MyCharacter's Name is %s"), *MyOwner->GetName());
 			UE_LOG(LogTemp, Warning, TEXT("Camera Shake"));
+
 			PC->ClientPlayCameraShake(fireCameraShake,2.0f);
 		
-			
-			
 			if (!fireCameraShake)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("fire camera Shake"));
+				UE_LOG(LogTemp, Warning, TEXT("no fire camera Shake"));
 			}
 
 			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->PlayCameraShake(fireCameraShake, 1.0f);
