@@ -60,9 +60,9 @@ private:
 
 	float defaultFOV;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	UPROPERTY(EditAnywhere, Category = "Player")
 	float zoomedFOV;
-	UPROPERTY(EditDefaultsOnly, Category = "Player", meta = (ClampMin = 0 , ClampMax = 100))
+	UPROPERTY(EditAnywhere, Category = "Player", meta = (ClampMin = 0 , ClampMax = 100))
 	float ZoomInterpSpeed;
 
 	UPROPERTY(EditAnywhere,Category = "Player")

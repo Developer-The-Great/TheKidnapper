@@ -22,19 +22,18 @@ ATPSCharacter::ATPSCharacter()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	CameraComponent->SetupAttachment(SpringArmComponent);
 
-
-	ZoomInterpSpeed = 20.0f;
+	//
+	
 }
 
 // Called when the game starts or when spawned
 void ATPSCharacter::BeginPlay()
 {
+
 	Super::BeginPlay();
 	GetMovementComponent()->GetNavAgentPropertiesRef().bCanCrouch = true;
 
 	defaultFOV = CameraComponent->FieldOfView;
-
-	zoomedFOV = 65.0f;
 
 	FActorSpawnParameters params;
 	params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
