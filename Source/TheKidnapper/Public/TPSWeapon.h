@@ -9,6 +9,7 @@
 
 class USkeletalMeshComponent;
 class UDamageType;
+class UParticleSystem;
 
 
 UCLASS()
@@ -33,7 +34,17 @@ protected:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "Components")
 	USkeletalMeshComponent * MeshComp;
 
+	UPROPERTY(VisibleDefaultsOnly, Category = "Weapon")
+	FName MuzzleSocketName;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	UParticleSystem* MuzzleEffect = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	UParticleSystem* defaultImpactEffect = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	UParticleSystem* fleshImpactEffect = nullptr;
 	
 
 public:	
@@ -49,6 +60,11 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	TSubclassOf<UCameraShake> fireCameraShake;
 
+
+	
+
 	void PlayFireEffects(FVector traceEnd);
+
+
 	
 };
