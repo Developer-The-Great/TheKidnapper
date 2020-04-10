@@ -5,6 +5,9 @@
 #include "DrawDebugHelpers.h"
 #include "Kismet/GameplayStatics.h"
 #include "Camera/CameraShake.h"
+#include "Particles/ParticleSystem.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
+#include "TheKidnapper.h"
 
 static int32 DebugWeaponDrawing = 0;
 
@@ -21,6 +24,8 @@ ATPSWeapon::ATPSWeapon()
 
 	MeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("MeshComp"));
 	RootComponent = MeshComp;
+
+	MuzzleSocketName = "MuzzleSocket";
 
 
 }
@@ -43,7 +48,7 @@ void ATPSWeapon::Fire()
 	if (MyOwner)
 	{
 		//get start position 
-		UE_LOG(LogTemp, Warning, TEXT("Shoott"));
+		
 
 		FVector startLocation;
 		FRotator EyeRotation;
@@ -55,7 +60,7 @@ void ATPSWeapon::Fire()
 		FCollisionQueryParams QueryParams;
 
 		QueryParams.AddIgnoredActor(MyOwner);
-
+		QueryParams.bReturnPhysicalMaterial = true;
 		QueryParams.AddIgnoredActor(this);
 
 		QueryParams.bTraceComplex = true;
@@ -68,6 +73,40 @@ void ATPSWeapon::Fire()
 			AActor * HitActor = HitResult.GetActor();
 			
 			UGameplayStatics::ApplyPointDamage(HitActor, 20.0f, EyeRotation.Vector(), HitResult, MyOwner->GetInstigatorController(), this, damageType);
+
+			//auto test = HitResult.PhysMaterial.Get();
+
+			EPhysicalSurface surface =  UPhysicalMaterial::DetermineSurfaceType(HitResult.PhysMaterial.Get());
+
+			UParticleSystem* selectedEffect = nullptr;
+
+			UE_LOG(LogTemp, Warning, TEXT("Shooting %s"),*HitResult.Actor->GetFName().ToString())
+			UE_LOG(LogTemp, Warning, TEXT("SurfaceType %d"), (int)surface)
+			//surface->
+			switch (surface)
+			{
+
+			case SurfaceType1:
+				UE_LOG(LogTemp, Warning, TEXT("SURFACE_FLESHDEFAULT"))
+				selectedEffect = fleshImpactEffect;
+				break;
+
+			case SurfaceType2:
+				UE_LOG(LogTemp, Warning, TEXT("SURFACE_FLESHVULNERABLE"))
+				selectedEffect = fleshImpactEffect;
+				break;
+
+			default:
+				UE_LOG(LogTemp, Warning, TEXT("default"))
+				selectedEffect = defaultImpactEffect;
+				break;
+			}
+
+			if (selectedEffect)
+			{
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), selectedEffect, HitResult.ImpactPoint, HitResult.ImpactNormal.Rotation());
+			}
+
 		}
 
 		if (DebugWeaponDrawing > 0)
@@ -119,7 +158,15 @@ void ATPSWeapon::PlayFireEffects(FVector traceEnd)
 
 			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->PlayCameraShake(fireCameraShake, 1.0f);
 
+			
+
+
 		}
+	}
+
+	if (MuzzleEffect)
+	{
+		UGameplayStatics::SpawnEmitterAttached(MuzzleEffect, MeshComp, MuzzleSocketName);
 	}
 
 
