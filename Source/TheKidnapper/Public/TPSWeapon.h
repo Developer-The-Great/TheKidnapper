@@ -21,11 +21,14 @@ public:
 	// Sets default values for this pawn's properties
 	ATPSWeapon();
 
-	UFUNCTION(BlueprintCallable,Category = "Weapon")
-	void Fire();
+	
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
 	TSubclassOf<UDamageType> damageType;
+
+	void BeginFire();
+	void EndFire();
+
 
 protected:
 	// Called when the game starts or when spawned
@@ -45,9 +48,18 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	UParticleSystem* fleshImpactEffect = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+		float baseDamage = 20.0f;
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+		float HeadShotDamage = 80.0f;
+
+	void Fire();
 	
 
 public:	
+
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -56,6 +68,16 @@ public:
 
 private:
 
+
+	float lastFireTime = 0.0f;
+
+	/* RPM - Bullets per minute fired by weapon */
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	float rateOfFire = 60.0f;
+
+	float timeBetweenShots;
+
+	FTimerHandle TimerHandle_RateBetweenShots;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	TSubclassOf<UCameraShake> fireCameraShake;

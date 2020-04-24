@@ -8,6 +8,7 @@
 #include "TPSWeapon.h"
 #include "Engine/World.h"
 #include "TPSWeapon.h"
+#include "TimerManager.h"
 
 // Sets default values
 ATPSCharacter::ATPSCharacter()
@@ -72,18 +73,20 @@ void ATPSCharacter::EndCrouch()
 
 void ATPSCharacter::BeginFire()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Begin Fire"))
+
 
 	if (currentWeapon)
 	{
-
-		UE_LOG(LogTemp, Warning, TEXT("Fire"))
-		currentWeapon->Fire();
+		currentWeapon->BeginFire();	
 	}
 }
 
 void ATPSCharacter::EndFire()
 {
+	if (currentWeapon)
+	{
+		currentWeapon->EndFire();
+	}
 }
 
 void ATPSCharacter::BeginZoom()
@@ -129,7 +132,7 @@ void ATPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("Zoom", IE_Released, this, &ATPSCharacter::EndZoom);
 
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ATPSCharacter::BeginFire);
-
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ATPSCharacter::EndFire);
 
 }
 
