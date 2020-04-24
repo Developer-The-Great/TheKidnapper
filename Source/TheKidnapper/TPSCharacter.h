@@ -30,8 +30,7 @@ protected:
 	void BeginCrouch();
 	void EndCrouch();
 
-	void BeginFire();
-	void EndFire();
+
 
 
 
@@ -54,11 +53,18 @@ public:
 	
 	virtual FVector GetPawnViewLocation() const override;
 
+	void BeginFire();
+
+	void EndFire();
+
 private:
 
 	
 
 	float defaultFOV;
+
+
+
 
 	UPROPERTY(EditAnywhere, Category = "Player")
 	float zoomedFOV;
@@ -70,6 +76,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<ATPSWeapon> starterWeaponClass;
+
+	
+
 
 
 

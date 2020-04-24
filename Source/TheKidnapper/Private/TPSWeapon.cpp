@@ -8,6 +8,7 @@
 #include "Particles/ParticleSystem.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "TheKidnapper.h"
+#include "TimerManager.h"
 
 static int32 DebugWeaponDrawing = 0;
 
@@ -16,6 +17,7 @@ FAutoConsoleVariableRef CVARDebugWeaponDrawing(
 	DebugWeaponDrawing,
 	TEXT("Draw debug lines for weapons"),
 	ECVF_Cheat);
+
 // Sets default values
 ATPSWeapon::ATPSWeapon()
 {
@@ -30,11 +32,27 @@ ATPSWeapon::ATPSWeapon()
 
 }
 
+void ATPSWeapon::BeginFire()
+{
+
+	float firstDelay = FMath::Max(lastFireTime + timeBetweenShots - GetWorld()->TimeSeconds,0.0f);
+
+	GetWorldTimerManager().SetTimer(TimerHandle_RateBetweenShots,this,&ATPSWeapon::Fire, timeBetweenShots, true, firstDelay);
+
+
+}
+
+void ATPSWeapon::EndFire()
+{
+	GetWorldTimerManager().ClearTimer(TimerHandle_RateBetweenShots);
+}
+
 // Called when the game starts or when spawned
 void ATPSWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	timeBetweenShots = 60.0f / rateOfFire;
 }
 
 void ATPSWeapon::Fire()
@@ -72,7 +90,7 @@ void ATPSWeapon::Fire()
 		{
 			AActor * HitActor = HitResult.GetActor();
 			
-			UGameplayStatics::ApplyPointDamage(HitActor, 20.0f, EyeRotation.Vector(), HitResult, MyOwner->GetInstigatorController(), this, damageType);
+			
 
 			//auto test = HitResult.PhysMaterial.Get();
 
@@ -80,18 +98,27 @@ void ATPSWeapon::Fire()
 
 			UParticleSystem* selectedEffect = nullptr;
 
-			UE_LOG(LogTemp, Warning, TEXT("Shooting %s"),*HitResult.Actor->GetFName().ToString())
-			UE_LOG(LogTemp, Warning, TEXT("SurfaceType %d"), (int)surface)
+			UE_LOG(LogTemp, Warning, TEXT("Shooting %s"), *HitResult.Actor->GetFName().ToString())
+				UE_LOG(LogTemp, Warning, TEXT("SurfaceType %d"), (int)surface)
+
+			float damage = baseDamage;
+			if (surface == SURFACE_FLESHVULNERABLE)
+			{
+				damage = HeadShotDamage;
+			}
+
+			UGameplayStatics::ApplyPointDamage(HitActor, damage, EyeRotation.Vector(), HitResult, MyOwner->GetInstigatorController(), this, damageType);
+
 			//surface->
 			switch (surface)
 			{
 
-			case SurfaceType1:
+			case SURFACE_FLESHDEFAULT:
 				UE_LOG(LogTemp, Warning, TEXT("SURFACE_FLESHDEFAULT"))
 				selectedEffect = fleshImpactEffect;
 				break;
 
-			case SurfaceType2:
+			case SURFACE_FLESHVULNERABLE:
 				UE_LOG(LogTemp, Warning, TEXT("SURFACE_FLESHVULNERABLE"))
 				selectedEffect = fleshImpactEffect;
 				break;
@@ -115,6 +142,8 @@ void ATPSWeapon::Fire()
 		}
 		
 		PlayFireEffects(endLocation);
+
+		lastFireTime = GetWorld()->TimeSeconds;
 
 	}
 }
