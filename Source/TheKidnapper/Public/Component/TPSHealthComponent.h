@@ -6,6 +6,8 @@
 #include "Components/SceneComponent.h"
 #include "TPSHealthComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_SixParams(FOnHealthChangedSignature,UTPSHealthComponent*,HealthComponent,float,Health,float,HealthDelta, 
+const class UDamageType*, DamageType, class AController*, InstigatedBy, AActor*, DamageCauser);
 
 UCLASS( ClassGroup=(COOP), meta=(BlueprintSpawnableComponent) )
 class THEKIDNAPPER_API UTPSHealthComponent : public USceneComponent
@@ -33,6 +35,7 @@ private:
 	UFUNCTION()
 	void OnTakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
-	
+	UPROPERTY(BlueprintAssignable,Category = "Events")
+	FOnHealthChangedSignature OnHealthChanged;
 	
 };
