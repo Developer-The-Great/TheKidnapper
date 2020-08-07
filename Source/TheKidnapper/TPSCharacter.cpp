@@ -9,6 +9,7 @@
 #include "Engine/World.h"
 #include "TPSWeapon.h"
 #include "TimerManager.h"
+#include "Components/SkeletalMeshComponent.h"
 
 // Sets default values
 ATPSCharacter::ATPSCharacter()
@@ -23,14 +24,11 @@ ATPSCharacter::ATPSCharacter()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	CameraComponent->SetupAttachment(SpringArmComponent);
 
-	//
-	
 }
 
 // Called when the game starts or when spawned
 void ATPSCharacter::BeginPlay()
 {
-
 	Super::BeginPlay();
 	GetMovementComponent()->GetNavAgentPropertiesRef().bCanCrouch = true;
 
@@ -51,12 +49,21 @@ void ATPSCharacter::BeginPlay()
 
 void ATPSCharacter::MoveForward(float value)
 {
+	//UE_LOG(LogTemp, Warning, TEXT("before move  %s"), *GetActorLocation().ToString());
+
 	AddMovementInput(GetActorForwardVector() * value);
+
+	//updateSocketPositions();
+
+	//UE_LOG(LogTemp, Warning, TEXT("after move  %s"), *GetActorLocation().ToString());
 }
 
 void ATPSCharacter::MoveRight(float value)
 {
 	AddMovementInput(GetActorRightVector() * value);
+
+	//updateSocketPositions();
+
 }
 
 void ATPSCharacter::BeginCrouch()
@@ -89,6 +96,35 @@ void ATPSCharacter::EndFire()
 	}
 }
 
+void ATPSCharacter::updateSocketPositions()
+{
+	if (currentWeapon)
+	{
+		//auto meshComp = currentWeapon->GetSkeletalMeshComponent();
+
+		FVector targetLocation = GetMesh()->GetSocketLocation("targetWeaponLocation");
+		FVector currentLocation = GetMesh()->GetSocketLocation("hand_r");
+
+		firstHandSocketLocation = FMath::Lerp(currentLocation, targetLocation,1.0f);
+		//firstHandSocketLocation = GetMesh()->GetSocketLocation("targetWeaponLocation");
+		rightElbowPlacementLocation = GetMesh()->GetSocketLocation("rightElbowPlacement");
+
+
+		//secondHandSocketLocation = meshComp->GetSocketLocation("secondHand");
+		//rightShoulderSocketLocation = GetMesh()->GetSocketLocation("lowerarm_r");
+		//
+		//rightElbowJointTarget = GetMesh()->GetSocketLocation("lowerarm_r");
+
+		UE_LOG(LogTemp, Warning, TEXT("Socket location updated"));
+
+		
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("No weapon"));
+	}
+}
+
 void ATPSCharacter::BeginZoom()
 {
 	bIsZooming = true;
@@ -105,11 +141,17 @@ void ATPSCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 
+	//-------------------------- set current character field of view ------------------------------------------//
+
 	float TargetFOV = bIsZooming ? zoomedFOV : defaultFOV;
 
 	float newFOV = FMath::FInterpTo(CameraComponent->FieldOfView, TargetFOV, DeltaTime, ZoomInterpSpeed);
 
 	CameraComponent->SetFieldOfView(newFOV);
+
+	//--------------------------- 
+	
+	updateSocketPositions();
 }
 
 // Called to bind functionality to input

@@ -153,6 +153,43 @@ void ATPSWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	AActor * MyOwner = GetOwner();
+
+	if (MyOwner)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("raycastHitSomething"));
+		FVector startLocation;
+		FRotator EyeRotation;
+
+		MyOwner->GetActorEyesViewPoint(startLocation, EyeRotation);
+
+		FVector endLocation = startLocation + EyeRotation.Vector() * 10000;
+
+		FCollisionQueryParams QueryParams;
+
+		QueryParams.AddIgnoredActor(MyOwner);
+		QueryParams.AddIgnoredActor(this);
+
+		FHitResult HitResult;
+		bool raycastHitSomething = GetWorld()->LineTraceSingleByChannel(HitResult, startLocation, endLocation, ECC_Visibility, QueryParams);
+
+		FRotator Rot;
+
+		if (raycastHitSomething)
+		{
+			//,FVector::UpVector
+			Rot = FRotationMatrix::MakeFromYZ(HitResult.ImpactPoint - startLocation, FVector::UpVector).Rotator();
+		}
+		else
+		{
+			Rot = FRotationMatrix::MakeFromYZ(endLocation - startLocation, FVector::UpVector).Rotator();
+		}
+
+		this->SetActorRotation(Rot);
+	}
+
+	
+
 }
 
 // Called to bind functionality to input

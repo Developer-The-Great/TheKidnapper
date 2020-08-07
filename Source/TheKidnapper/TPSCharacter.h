@@ -31,7 +31,19 @@ protected:
 	void EndCrouch();
 
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "IKSocket")
+		FVector firstHandSocketLocation;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "IKSocket")
+		FVector secondHandSocketLocation;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "IKSocket")
+		FVector rightShoulderSocketLocation;
+
+	UPROPERTY(BlueprintReadOnly, Category = "IKSocket")
+		FVector rightElbowPlacementLocation;
+
+	UPROPERTY(BlueprintReadOnly, Category = "IKSocket")
+		FVector rightElbowJointTarget;
 
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "Components")
@@ -59,10 +71,10 @@ public:
 
 private:
 
-	
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	void updateSocketPositions();
 
 	float defaultFOV;
-
 
 
 
@@ -77,10 +89,8 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<ATPSWeapon> starterWeaponClass;
 
-	
-
-
-
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	float animationInterp = 0.5f;
 
 	float currentFOV;
 
