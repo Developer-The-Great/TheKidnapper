@@ -9,6 +9,7 @@
 #include "Engine/World.h"
 #include "TPSWeapon.h"
 #include "TimerManager.h"
+#include "Components/SkeletalMeshComponent.h"
 
 // Sets default values
 ATPSCharacter::ATPSCharacter()
@@ -23,16 +24,14 @@ ATPSCharacter::ATPSCharacter()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	CameraComponent->SetupAttachment(SpringArmComponent);
 
-	//
-	
 }
 
 // Called when the game starts or when spawned
 void ATPSCharacter::BeginPlay()
 {
-
 	Super::BeginPlay();
 	GetMovementComponent()->GetNavAgentPropertiesRef().bCanCrouch = true;
+	//GetMovementComponent()->can
 
 	defaultFOV = CameraComponent->FieldOfView;
 
@@ -47,16 +46,27 @@ void ATPSCharacter::BeginPlay()
 		UE_LOG(LogTemp, Warning, TEXT("Current weapon"))
 		currentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "WeaponSocket");
 	}
+
+	averageDeltaTime.Init(0, maxArrayElements);
 }
 
 void ATPSCharacter::MoveForward(float value)
 {
+	//UE_LOG(LogTemp, Warning, TEXT("before move  %s"), *GetActorLocation().ToString());
+
 	AddMovementInput(GetActorForwardVector() * value);
+
+	//updateSocketPositions();
+
+	//UE_LOG(LogTemp, Warning, TEXT("after move  %s"), *GetActorLocation().ToString());
 }
 
 void ATPSCharacter::MoveRight(float value)
 {
 	AddMovementInput(GetActorRightVector() * value);
+
+	//updateSocketPositions();
+
 }
 
 void ATPSCharacter::BeginCrouch()
@@ -89,6 +99,40 @@ void ATPSCharacter::EndFire()
 	}
 }
 
+void ATPSCharacter::updateSocketPositions()
+{
+	if (currentWeapon)
+	{
+		FVector speedOffset = GetVelocity() * currentAverageDeltaTime;
+
+		if (bIsCrouched)
+		{
+			firstHandSocketLocation = GetMesh()->GetSocketLocation("crouchTargetWeaponLocation") + speedOffset;
+		}
+		else
+		{
+			firstHandSocketLocation = GetMesh()->GetSocketLocation("targetWeaponLocation") + speedOffset;
+		}
+
+		rightElbowPlacementLocation = GetMesh()->GetSocketLocation("rightElbowPlacement");
+
+		auto weaponMeshComp = currentWeapon->GetSkeletalMeshComponent();
+
+		secondHandSocketLocation = weaponMeshComp->GetSocketLocation("secondHand") + speedOffset;
+		leftElbowPlacementLocation = GetMesh()->GetSocketLocation("leftElbowPlacement");
+
+		//GetVelocity()
+
+		UE_LOG(LogTemp, Warning, TEXT("Velocity %s"),*(GetVelocity() * currentAverageDeltaTime).ToString());
+		UE_LOG(LogTemp, Warning, TEXT("currentAverageDeltaTime %f"), currentAverageDeltaTime);
+		
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("No weapon"));
+	}
+}
+
 void ATPSCharacter::BeginZoom()
 {
 	bIsZooming = true;
@@ -103,13 +147,32 @@ void ATPSCharacter::EndZoom()
 void ATPSCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	//storedDeltaTime = DeltaTime;
+	//-------------------------- set current character field of view ------------------------------------------//
 
 	float TargetFOV = bIsZooming ? zoomedFOV : defaultFOV;
 
 	float newFOV = FMath::FInterpTo(CameraComponent->FieldOfView, TargetFOV, DeltaTime, ZoomInterpSpeed);
 
 	CameraComponent->SetFieldOfView(newFOV);
+
+	//--------------------------- 
+	
+	averageDeltaTime.Add(DeltaTime);
+
+	if (averageDeltaTime.Num() > maxArrayElements)
+	{
+		averageDeltaTime.RemoveAt(0);
+	}
+
+	currentAverageDeltaTime = 0;
+
+	for (float deltaTick : averageDeltaTime)
+	{
+		currentAverageDeltaTime += deltaTick;
+	}
+
+	currentAverageDeltaTime /= maxArrayElements;
 }
 
 // Called to bind functionality to input

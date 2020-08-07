@@ -21,7 +21,7 @@ public:
 	// Sets default values for this pawn's properties
 	ATPSWeapon();
 
-	
+	USkeletalMeshComponent* GetSkeletalMeshComponent();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
 	TSubclassOf<UDamageType> damageType;
@@ -35,7 +35,10 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "Components")
-	USkeletalMeshComponent * MeshComp;
+	USkeletalMeshComponent * MeshComp = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	USceneComponent * sceneComp = nullptr;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "Weapon")
 	FName MuzzleSocketName;
@@ -56,9 +59,7 @@ protected:
 
 	void Fire();
 	
-
 public:	
-
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -68,12 +69,13 @@ public:
 
 private:
 
+	FVector lookAtSpot = FVector(0,0,0);
 
 	float lastFireTime = 0.0f;
 
 	/* RPM - Bullets per minute fired by weapon */
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
-	float rateOfFire = 60.0f;
+	float rateOfFire = 600.0f;
 
 	float timeBetweenShots;
 
