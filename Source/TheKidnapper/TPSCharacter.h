@@ -37,14 +37,10 @@ protected:
 		FVector secondHandSocketLocation;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "IKSocket")
-		FVector rightShoulderSocketLocation;
+		FVector leftElbowPlacementLocation;
 
 	UPROPERTY(BlueprintReadOnly, Category = "IKSocket")
 		FVector rightElbowPlacementLocation;
-
-	UPROPERTY(BlueprintReadOnly, Category = "IKSocket")
-		FVector rightElbowJointTarget;
-
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "Components")
 	UCameraComponent* CameraComponent;
@@ -70,6 +66,12 @@ public:
 	void EndFire();
 
 private:
+
+	float currentAverageDeltaTime;
+
+	TArray<float> averageDeltaTime;
+
+	const int maxArrayElements = 10;
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void updateSocketPositions();

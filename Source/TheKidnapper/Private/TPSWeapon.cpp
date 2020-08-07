@@ -25,11 +25,19 @@ ATPSWeapon::ATPSWeapon()
 	PrimaryActorTick.bCanEverTick = true;
 
 	MeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("MeshComp"));
-	RootComponent = MeshComp;
+	sceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComp"));
+
+	MeshComp->AttachTo(sceneComp);
+	RootComponent = sceneComp;
 
 	MuzzleSocketName = "MuzzleSocket";
 
 
+}
+
+USkeletalMeshComponent * ATPSWeapon::GetSkeletalMeshComponent()
+{
+	return MeshComp;
 }
 
 void ATPSWeapon::BeginFire()
@@ -53,6 +61,8 @@ void ATPSWeapon::BeginPlay()
 	Super::BeginPlay();
 	
 	timeBetweenShots = 60.0f / rateOfFire;
+
+
 }
 
 void ATPSWeapon::Fire()
@@ -73,7 +83,7 @@ void ATPSWeapon::Fire()
 
 		MyOwner->GetActorEyesViewPoint(startLocation, EyeRotation);
 
-		FVector endLocation = startLocation + EyeRotation.Vector() * 10000;
+		
 
 		FCollisionQueryParams QueryParams;
 
@@ -83,6 +93,8 @@ void ATPSWeapon::Fire()
 
 		QueryParams.bTraceComplex = true;
 
+		FVector endLocation = startLocation + EyeRotation.Vector() * 10000;
+
 		FHitResult HitResult;
 		bool bulletHitSomething = GetWorld()->LineTraceSingleByChannel(HitResult, startLocation, endLocation,ECC_Visibility,QueryParams);
 
@@ -90,8 +102,6 @@ void ATPSWeapon::Fire()
 		{
 			AActor * HitActor = HitResult.GetActor();
 			
-			
-
 			//auto test = HitResult.PhysMaterial.Get();
 
 			EPhysicalSurface surface =  UPhysicalMaterial::DetermineSurfaceType(HitResult.PhysMaterial.Get());

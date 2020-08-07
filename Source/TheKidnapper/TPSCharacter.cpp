@@ -31,6 +31,7 @@ void ATPSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	GetMovementComponent()->GetNavAgentPropertiesRef().bCanCrouch = true;
+	//GetMovementComponent()->can
 
 	defaultFOV = CameraComponent->FieldOfView;
 
@@ -45,6 +46,8 @@ void ATPSCharacter::BeginPlay()
 		UE_LOG(LogTemp, Warning, TEXT("Current weapon"))
 		currentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, "WeaponSocket");
 	}
+
+	averageDeltaTime.Init(0, maxArrayElements);
 }
 
 void ATPSCharacter::MoveForward(float value)
@@ -100,23 +103,28 @@ void ATPSCharacter::updateSocketPositions()
 {
 	if (currentWeapon)
 	{
-		//auto meshComp = currentWeapon->GetSkeletalMeshComponent();
+		FVector speedOffset = GetVelocity() * currentAverageDeltaTime;
 
-		FVector targetLocation = GetMesh()->GetSocketLocation("targetWeaponLocation");
-		FVector currentLocation = GetMesh()->GetSocketLocation("hand_r");
+		if (bIsCrouched)
+		{
+			firstHandSocketLocation = GetMesh()->GetSocketLocation("crouchTargetWeaponLocation") + speedOffset;
+		}
+		else
+		{
+			firstHandSocketLocation = GetMesh()->GetSocketLocation("targetWeaponLocation") + speedOffset;
+		}
 
-		firstHandSocketLocation = FMath::Lerp(currentLocation, targetLocation,1.0f);
-		//firstHandSocketLocation = GetMesh()->GetSocketLocation("targetWeaponLocation");
 		rightElbowPlacementLocation = GetMesh()->GetSocketLocation("rightElbowPlacement");
 
+		auto weaponMeshComp = currentWeapon->GetSkeletalMeshComponent();
 
-		//secondHandSocketLocation = meshComp->GetSocketLocation("secondHand");
-		//rightShoulderSocketLocation = GetMesh()->GetSocketLocation("lowerarm_r");
-		//
-		//rightElbowJointTarget = GetMesh()->GetSocketLocation("lowerarm_r");
+		secondHandSocketLocation = weaponMeshComp->GetSocketLocation("secondHand") + speedOffset;
+		leftElbowPlacementLocation = GetMesh()->GetSocketLocation("leftElbowPlacement");
 
-		UE_LOG(LogTemp, Warning, TEXT("Socket location updated"));
+		//GetVelocity()
 
+		UE_LOG(LogTemp, Warning, TEXT("Velocity %s"),*(GetVelocity() * currentAverageDeltaTime).ToString());
+		UE_LOG(LogTemp, Warning, TEXT("currentAverageDeltaTime %f"), currentAverageDeltaTime);
 		
 	}
 	else
@@ -139,8 +147,7 @@ void ATPSCharacter::EndZoom()
 void ATPSCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-
+	//storedDeltaTime = DeltaTime;
 	//-------------------------- set current character field of view ------------------------------------------//
 
 	float TargetFOV = bIsZooming ? zoomedFOV : defaultFOV;
@@ -151,7 +158,21 @@ void ATPSCharacter::Tick(float DeltaTime)
 
 	//--------------------------- 
 	
-	updateSocketPositions();
+	averageDeltaTime.Add(DeltaTime);
+
+	if (averageDeltaTime.Num() > maxArrayElements)
+	{
+		averageDeltaTime.RemoveAt(0);
+	}
+
+	currentAverageDeltaTime = 0;
+
+	for (float deltaTick : averageDeltaTime)
+	{
+		currentAverageDeltaTime += deltaTick;
+	}
+
+	currentAverageDeltaTime /= maxArrayElements;
 }
 
 // Called to bind functionality to input
