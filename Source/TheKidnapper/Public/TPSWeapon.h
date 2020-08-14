@@ -57,6 +57,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 		float HeadShotDamage = 80.0f;
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "FiringEvent")
+		void OnFire();
+
 	void Fire();
 	
 public:	

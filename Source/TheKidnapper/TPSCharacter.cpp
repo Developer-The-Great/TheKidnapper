@@ -101,9 +101,11 @@ void ATPSCharacter::EndFire()
 
 void ATPSCharacter::updateSocketPositions()
 {
+	FVector speedOffset = GetVelocity() * currentAverageDeltaTime;
+
 	if (currentWeapon)
 	{
-		FVector speedOffset = GetVelocity() * currentAverageDeltaTime;
+		
 
 		if (bIsCrouched)
 		{
@@ -122,14 +124,24 @@ void ATPSCharacter::updateSocketPositions()
 		leftElbowPlacementLocation = GetMesh()->GetSocketLocation("leftElbowPlacement");
 
 		//GetVelocity()
-
-		UE_LOG(LogTemp, Warning, TEXT("Velocity %s"),*(GetVelocity() * currentAverageDeltaTime).ToString());
-		UE_LOG(LogTemp, Warning, TEXT("currentAverageDeltaTime %f"), currentAverageDeltaTime);
 		
+		
+		currentWeapon->CheckDefaultSubobjects();
+		currentWeapon->CheckDefaultSubobjects();
+		currentWeapon->CheckDefaultSubobjects();
+		//currentWeapon->CheckForErrors();
+		//currentWeapon->CheckForErrors();
+
+		//UE_LOG(LogTemp, Warning, TEXT("Velocity %s"),*(GetVelocity() * currentAverageDeltaTime).ToString());
+		
+		UE_LOG(LogTemp, Warning, TEXT("currentAverageDeltaTime %f"), currentAverageDeltaTime);
+		UE_LOG(LogTemp, Warning, TEXT("a %f"), currentAverageDeltaTime);
+		UE_LOG(LogTemp, Warning, TEXT("b %f"), currentAverageDeltaTime);
+		UE_LOG(LogTemp, Warning, TEXT("c %f"), currentAverageDeltaTime);
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("No weapon"));
+		//UE_LOG(LogTemp, Error, TEXT("No weapon"));
 	}
 }
 
@@ -173,6 +185,9 @@ void ATPSCharacter::Tick(float DeltaTime)
 	}
 
 	currentAverageDeltaTime /= maxArrayElements;
+
+
+	
 }
 
 // Called to bind functionality to input

@@ -67,14 +67,13 @@ void ATPSWeapon::BeginPlay()
 
 void ATPSWeapon::Fire()
 {
-	//We would like to now if the weapon has an owner
-
 	AActor * MyOwner = GetOwner();
 	//if there is an owner
 	UE_LOG(LogTemp, Warning, TEXT("Fire()"));
 
 	if (MyOwner)
 	{
+		OnFire();
 		//get start position 
 		
 
