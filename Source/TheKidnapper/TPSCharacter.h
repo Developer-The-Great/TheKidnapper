@@ -31,8 +31,16 @@ protected:
 	void EndCrouch();
 
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "IKSocket")
+		FVector firstHandSocketLocation;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "IKSocket")
+		FVector secondHandSocketLocation;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "IKSocket")
+		FVector leftElbowPlacementLocation;
 
+	UPROPERTY(BlueprintReadOnly, Category = "IKSocket")
+		FVector rightElbowPlacementLocation;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "Components")
 	UCameraComponent* CameraComponent;
@@ -59,10 +67,16 @@ public:
 
 private:
 
-	
+	float currentAverageDeltaTime;
+
+	TArray<float> averageDeltaTime;
+
+	const int maxArrayElements = 10;
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	void updateSocketPositions();
 
 	float defaultFOV;
-
 
 
 
@@ -77,10 +91,8 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<ATPSWeapon> starterWeaponClass;
 
-	
-
-
-
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	float animationInterp = 0.5f;
 
 	float currentFOV;
 

@@ -25,11 +25,19 @@ ATPSWeapon::ATPSWeapon()
 	PrimaryActorTick.bCanEverTick = true;
 
 	MeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("MeshComp"));
-	RootComponent = MeshComp;
+	sceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComp"));
+
+	MeshComp->AttachTo(sceneComp);
+	RootComponent = sceneComp;
 
 	MuzzleSocketName = "MuzzleSocket";
 
 
+}
+
+USkeletalMeshComponent * ATPSWeapon::GetSkeletalMeshComponent()
+{
+	return MeshComp;
 }
 
 void ATPSWeapon::BeginFire()
@@ -53,18 +61,19 @@ void ATPSWeapon::BeginPlay()
 	Super::BeginPlay();
 	
 	timeBetweenShots = 60.0f / rateOfFire;
+
+
 }
 
 void ATPSWeapon::Fire()
 {
-	//We would like to now if the weapon has an owner
-
 	AActor * MyOwner = GetOwner();
 	//if there is an owner
 	UE_LOG(LogTemp, Warning, TEXT("Fire()"));
 
 	if (MyOwner)
 	{
+		OnFire();
 		//get start position 
 		
 
@@ -73,7 +82,7 @@ void ATPSWeapon::Fire()
 
 		MyOwner->GetActorEyesViewPoint(startLocation, EyeRotation);
 
-		FVector endLocation = startLocation + EyeRotation.Vector() * 10000;
+		
 
 		FCollisionQueryParams QueryParams;
 
@@ -83,6 +92,8 @@ void ATPSWeapon::Fire()
 
 		QueryParams.bTraceComplex = true;
 
+		FVector endLocation = startLocation + EyeRotation.Vector() * 10000;
+
 		FHitResult HitResult;
 		bool bulletHitSomething = GetWorld()->LineTraceSingleByChannel(HitResult, startLocation, endLocation,ECC_Visibility,QueryParams);
 
@@ -90,8 +101,6 @@ void ATPSWeapon::Fire()
 		{
 			AActor * HitActor = HitResult.GetActor();
 			
-			
-
 			//auto test = HitResult.PhysMaterial.Get();
 
 			EPhysicalSurface surface =  UPhysicalMaterial::DetermineSurfaceType(HitResult.PhysMaterial.Get());
@@ -152,6 +161,43 @@ void ATPSWeapon::Fire()
 void ATPSWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	AActor * MyOwner = GetOwner();
+
+	if (MyOwner)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("raycastHitSomething"));
+		FVector startLocation;
+		FRotator EyeRotation;
+
+		MyOwner->GetActorEyesViewPoint(startLocation, EyeRotation);
+
+		FVector endLocation = startLocation + EyeRotation.Vector() * 10000;
+
+		FCollisionQueryParams QueryParams;
+
+		QueryParams.AddIgnoredActor(MyOwner);
+		QueryParams.AddIgnoredActor(this);
+
+		FHitResult HitResult;
+		bool raycastHitSomething = GetWorld()->LineTraceSingleByChannel(HitResult, startLocation, endLocation, ECC_Visibility, QueryParams);
+
+		FRotator Rot;
+
+		if (raycastHitSomething)
+		{
+			//,FVector::UpVector
+			Rot = FRotationMatrix::MakeFromYZ(HitResult.ImpactPoint - startLocation, FVector::UpVector).Rotator();
+		}
+		else
+		{
+			Rot = FRotationMatrix::MakeFromYZ(endLocation - startLocation, FVector::UpVector).Rotator();
+		}
+
+		this->SetActorRotation(Rot);
+	}
+
+	
 
 }
 
