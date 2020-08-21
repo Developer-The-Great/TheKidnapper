@@ -39,7 +39,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "IKSocket")
 		FVector leftElbowPlacementLocation;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "IKSocket")
+	UPROPERTY(BlueprintReadOnly, Category = "IKSocket")
 		FVector rightElbowPlacementLocation;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "Components")
