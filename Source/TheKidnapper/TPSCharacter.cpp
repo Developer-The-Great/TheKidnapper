@@ -101,7 +101,7 @@ void ATPSCharacter::EndFire()
 
 void ATPSCharacter::updateSocketPositions()
 {
-	FVector speedOffset = GetVelocity() * currentAverageDeltaTime;
+	FVector speedOffset = GetVelocity() * 0.0f;
 
 	if (currentWeapon)
 	{
@@ -126,18 +126,19 @@ void ATPSCharacter::updateSocketPositions()
 		//GetVelocity()
 		
 		
-		currentWeapon->CheckDefaultSubobjects();
-		currentWeapon->CheckDefaultSubobjects();
-		currentWeapon->CheckDefaultSubobjects();
+		//currentWeapon->CheckDefaultSubobjects();
+		//currentWeapon->CheckDefaultSubobjects();
+		//currentWeapon->CheckDefaultSubobjects();
+		//currentWeapon->CheckDefaultSubobjects();
 		//currentWeapon->CheckForErrors();
 		//currentWeapon->CheckForErrors();
 
 		//UE_LOG(LogTemp, Warning, TEXT("Velocity %s"),*(GetVelocity() * currentAverageDeltaTime).ToString());
 		
-		UE_LOG(LogTemp, Warning, TEXT("currentAverageDeltaTime %f"), currentAverageDeltaTime);
+	/*	UE_LOG(LogTemp, Warning, TEXT("currentAverageDeltaTime %f"), currentAverageDeltaTime);
 		UE_LOG(LogTemp, Warning, TEXT("a %f"), currentAverageDeltaTime);
 		UE_LOG(LogTemp, Warning, TEXT("b %f"), currentAverageDeltaTime);
-		UE_LOG(LogTemp, Warning, TEXT("c %f"), currentAverageDeltaTime);
+		UE_LOG(LogTemp, Warning, TEXT("c %f"), currentAverageDeltaTime);*/
 	}
 	else
 	{
