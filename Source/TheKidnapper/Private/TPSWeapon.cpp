@@ -9,7 +9,8 @@
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "TheKidnapper.h"
 #include "TimerManager.h"
-
+#include "Components/SkeletalMeshComponent.h"
+#include "Particles/ParticleSystemComponent.h"
 static int32 DebugWeaponDrawing = 0;
 
 FAutoConsoleVariableRef CVARDebugWeaponDrawing(
@@ -97,9 +98,13 @@ void ATPSWeapon::Fire()
 		FHitResult HitResult;
 		bool bulletHitSomething = GetWorld()->LineTraceSingleByChannel(HitResult, startLocation, endLocation,ECC_Visibility,QueryParams);
 
+		FVector tracerEnd = endLocation;
+
 		if (bulletHitSomething)
 		{
+			
 			AActor * HitActor = HitResult.GetActor();
+			tracerEnd = HitResult.ImpactPoint;
 			
 			//auto test = HitResult.PhysMaterial.Get();
 
@@ -151,6 +156,23 @@ void ATPSWeapon::Fire()
 		}
 		
 		PlayFireEffects(endLocation);
+
+
+		if (tracerEffect)
+		{
+			FVector MuzzleLocation = GetSkeletalMeshComponent()->GetSocketLocation(MuzzleSocketName);
+			UParticleSystemComponent * tracer =  UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), tracerEffect, MuzzleLocation);
+
+			if (tracer)
+			{
+				tracer->SetVectorParameter("BeamEnd", tracerEnd);
+			}
+
+		}
+		
+
+
+
 
 		lastFireTime = GetWorld()->TimeSeconds;
 

@@ -101,7 +101,7 @@ void ATPSCharacter::EndFire()
 
 void ATPSCharacter::updateSocketPositions()
 {
-	FVector speedOffset = GetVelocity() * currentAverageDeltaTime;
+	//FVector speedOffset = GetVelocity() *0;
 
 	if (currentWeapon)
 	{
@@ -109,35 +109,21 @@ void ATPSCharacter::updateSocketPositions()
 
 		if (bIsCrouched)
 		{
-			firstHandSocketLocation = GetMesh()->GetSocketLocation("crouchTargetWeaponLocation") + speedOffset;
+			firstHandSocketLocation = GetMesh()->GetSocketLocation("crouchTargetWeaponLocation") ;
 		}
 		else
 		{
-			firstHandSocketLocation = GetMesh()->GetSocketLocation("targetWeaponLocation") + speedOffset;
+			firstHandSocketLocation = GetMesh()->GetSocketLocation("targetWeaponLocation") ;
 		}
 
 		rightElbowPlacementLocation = GetMesh()->GetSocketLocation("rightElbowPlacement");
 
 		auto weaponMeshComp = currentWeapon->GetSkeletalMeshComponent();
 
-		secondHandSocketLocation = weaponMeshComp->GetSocketLocation("secondHand") + speedOffset;
+		secondHandSocketLocation = weaponMeshComp->GetSocketLocation("secondHand") ;
 		leftElbowPlacementLocation = GetMesh()->GetSocketLocation("leftElbowPlacement");
 
-		//GetVelocity()
-		
-		
-		currentWeapon->CheckDefaultSubobjects();
-		currentWeapon->CheckDefaultSubobjects();
-		currentWeapon->CheckDefaultSubobjects();
-		//currentWeapon->CheckForErrors();
-		//currentWeapon->CheckForErrors();
 
-		//UE_LOG(LogTemp, Warning, TEXT("Velocity %s"),*(GetVelocity() * currentAverageDeltaTime).ToString());
-		
-		UE_LOG(LogTemp, Warning, TEXT("currentAverageDeltaTime %f"), currentAverageDeltaTime);
-		UE_LOG(LogTemp, Warning, TEXT("a %f"), currentAverageDeltaTime);
-		UE_LOG(LogTemp, Warning, TEXT("b %f"), currentAverageDeltaTime);
-		UE_LOG(LogTemp, Warning, TEXT("c %f"), currentAverageDeltaTime);
 	}
 	else
 	{

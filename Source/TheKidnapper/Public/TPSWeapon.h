@@ -47,6 +47,9 @@ protected:
 	UParticleSystem* MuzzleEffect = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	UParticleSystem* tracerEffect = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	UParticleSystem* defaultImpactEffect = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
