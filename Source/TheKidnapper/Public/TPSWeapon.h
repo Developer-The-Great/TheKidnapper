@@ -34,6 +34,12 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon", meta = (ClampMin = 0, ClampMax = 90))
+		float maxVerticalSprayAngle = 10.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon", meta = (ClampMin = 0, ClampMax = 90))
+		float maxHorizontalSprayAngle = 10.0f;
+
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "Components")
 	USkeletalMeshComponent * MeshComp = nullptr;
 
@@ -74,6 +80,9 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
+
+	void sprayBasedDirectionModify(FVector& directionToModify);
+
 
 	FVector lookAtSpot = FVector(0,0,0);
 
