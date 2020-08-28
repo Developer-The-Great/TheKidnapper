@@ -19,6 +19,8 @@ public:
 	// Sets default values for this character's properties
 	ATPSCharacter();
 
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -29,6 +31,9 @@ protected:
 
 	void BeginCrouch();
 	void EndCrouch();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player")
+		ATPSWeapon * currentWeapon;
 
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "IKSocket")
@@ -79,14 +84,15 @@ private:
 	float defaultFOV;
 
 
+	
+
 
 	UPROPERTY(EditAnywhere, Category = "Player")
 	float zoomedFOV;
 	UPROPERTY(EditAnywhere, Category = "Player", meta = (ClampMin = 0 , ClampMax = 100))
 	float ZoomInterpSpeed;
 
-	UPROPERTY(EditAnywhere,Category = "Player")
-	ATPSWeapon * currentWeapon;
+
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<ATPSWeapon> starterWeaponClass;
