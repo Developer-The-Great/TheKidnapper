@@ -93,7 +93,10 @@ void ATPSWeapon::Fire()
 
 		QueryParams.bTraceComplex = true;
 
-		FVector endLocation = startLocation + EyeRotation.Vector() * 10000;
+		FVector shotDirection = EyeRotation.Vector();
+		sprayBasedDirectionModify(shotDirection);
+
+		FVector endLocation = startLocation + shotDirection * 10000;
 
 		FHitResult HitResult;
 		bool bulletHitSomething = GetWorld()->LineTraceSingleByChannel(HitResult, startLocation, endLocation,ECC_Visibility,QueryParams);
@@ -206,15 +209,7 @@ void ATPSWeapon::Tick(float DeltaTime)
 
 		FRotator Rot;
 
-		if (raycastHitSomething)
-		{
-			//,FVector::UpVector
-			Rot = FRotationMatrix::MakeFromYZ(HitResult.ImpactPoint - startLocation, FVector::UpVector).Rotator();
-		}
-		else
-		{
-			Rot = FRotationMatrix::MakeFromYZ(endLocation - startLocation, FVector::UpVector).Rotator();
-		}
+		Rot = FRotationMatrix::MakeFromYZ(endLocation - startLocation, FVector::UpVector).Rotator();
 
 		this->SetActorRotation(Rot);
 	}
@@ -228,6 +223,32 @@ void ATPSWeapon::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void ATPSWeapon::sprayBasedDirectionModify(FVector & directionToModify)
+{
+	FVector up;
+
+	FVector right = FVector::CrossProduct(directionToModify, FVector::UpVector);
+	
+
+	if (FMath::IsNearlyZero(right.Size()))
+	{
+		right = FVector(0,1,0);
+		up = FVector(1, 0, 0);
+	}
+	else 
+	{
+		right.Normalize();
+		up = FVector::CrossProduct(directionToModify, right);
+		up.Normalize();
+	}
+
+	float horizontalRot = FMath::FRandRange(-maxHorizontalSprayAngle, maxHorizontalSprayAngle);
+	float verticalRot = FMath::FRandRange(-maxVerticalSprayAngle, maxVerticalSprayAngle);
+
+	directionToModify = directionToModify.RotateAngleAxis(verticalRot, right);
+	directionToModify = directionToModify.RotateAngleAxis(horizontalRot, up);
 }
 
 void ATPSWeapon::PlayFireEffects(FVector traceEnd)
