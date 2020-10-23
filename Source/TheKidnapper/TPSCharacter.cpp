@@ -10,6 +10,8 @@
 #include "TPSWeapon.h"
 #include "TimerManager.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "TPSHealthComponent.h"
+#include "Components/CapsuleComponent.h"
 
 // Sets default values
 ATPSCharacter::ATPSCharacter()
@@ -24,12 +26,17 @@ ATPSCharacter::ATPSCharacter()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	CameraComponent->SetupAttachment(SpringArmComponent);
 
+	healthComp = CreateDefaultSubobject<UTPSHealthComponent>(TEXT("HealthComponent"));
+	
+	
+
 }
 
 // Called when the game starts or when spawned
 void ATPSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	healthComp->OnHealthChanged.AddDynamic(this, &ATPSCharacter::OnHealthChanged);
 	GetMovementComponent()->GetNavAgentPropertiesRef().bCanCrouch = true;
 	//GetMovementComponent()->can
 
@@ -97,6 +104,28 @@ void ATPSCharacter::EndFire()
 	{
 		currentWeapon->EndFire();
 	}
+}
+
+void ATPSCharacter::OnHealthChanged(UTPSHealthComponent* HealthComponent, float Health, float HealthDelta,
+	const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
+{
+	UE_LOG(LogTemp, Warning, TEXT("A Character took damage"));
+
+	if (Health <= 0.0f && !bDied)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("A Character has Died"));
+		bDied = true;
+		GetMovementComponent()->StopMovementImmediately();
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+		DetachFromControllerPendingDestroy();
+
+		SetLifeSpan(10.0f);
+
+
+
+	}
+
 }
 
 void ATPSCharacter::updateSocketPositions()

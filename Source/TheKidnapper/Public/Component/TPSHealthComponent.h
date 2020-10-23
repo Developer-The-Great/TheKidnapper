@@ -18,6 +18,9 @@ public:
 	// Sets default values for this component's properties
 	UTPSHealthComponent();
 
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnHealthChangedSignature OnHealthChanged;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -35,7 +38,6 @@ private:
 	UFUNCTION()
 	void OnTakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
-	UPROPERTY(BlueprintAssignable,Category = "Events")
-	FOnHealthChangedSignature OnHealthChanged;
+
 	
 };

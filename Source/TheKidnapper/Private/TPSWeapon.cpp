@@ -87,9 +87,9 @@ void ATPSWeapon::Fire()
 
 		FCollisionQueryParams QueryParams;
 
-		QueryParams.AddIgnoredActor(MyOwner);
+		//QueryParams.AddIgnoredActor(MyOwner);
 		QueryParams.bReturnPhysicalMaterial = true;
-		QueryParams.AddIgnoredActor(this);
+		//QueryParams.AddIgnoredActor(this);
 
 		QueryParams.bTraceComplex = true;
 

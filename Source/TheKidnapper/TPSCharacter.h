@@ -9,6 +9,7 @@
 class UCameraComponent;
 class USpringArmComponent;
 class ATPSWeapon;
+class UTPSHealthComponent;
 
 UCLASS()
 class THEKIDNAPPER_API ATPSCharacter : public ACharacter
@@ -35,6 +36,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player")
 		ATPSWeapon * currentWeapon;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UTPSHealthComponent * healthComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "IKSocket")
 		FVector firstHandSocketLocation;
@@ -69,7 +72,13 @@ public:
 	void BeginFire();
 
 	void EndFire();
+	// 
+	UFUNCTION()
+	void OnHealthChanged(UTPSHealthComponent* HealthComponent, float Health, float HealthDelta,
+		const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
+	UPROPERTY( BlueprintReadOnly, Category = "Player")
+	bool bDied;
 private:
 
 	float currentAverageDeltaTime;

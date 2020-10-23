@@ -57,5 +57,7 @@ void UTPSHealthComponent::OnTakeDamage(AActor * DamagedActor, float Damage, cons
 
 	UE_LOG(LogTemp, Log, TEXT("Health Changed: %s"), *FString::SanitizeFloat(health));
 
+	OnHealthChanged.Broadcast(this, health, Damage, DamageType, InstigatedBy, DamageCauser);
+
 }
 
