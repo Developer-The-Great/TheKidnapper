@@ -123,7 +123,6 @@ void ATPSCharacter::OnHealthChanged(UTPSHealthComponent* HealthComponent, float 
 		SetLifeSpan(10.0f);
 
 
-
 	}
 
 }
